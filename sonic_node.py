@@ -54,7 +54,7 @@ class SONICLoader:
         }
 
     RETURN_TYPES = ("MODEL_SONIC","DTYPE")
-    RETURN_NAMES = ("model","dtype")
+    RETURN_NAMES = ("model","weight_dtype")
     FUNCTION = "loader_main"
     CATEGORY = "SONIC"
 
@@ -254,13 +254,6 @@ class SONICSampler:
     def sampler_main(self, model, data_dict, seed, inference_steps, dynamic_scale, fps):
 
         print("***********Start infer  ***********")
-        # # 当前分配的 CUDA 内存
-        # current_memory = torch.cuda.memory_allocated()
-        # print(f"Current CUDA memory allocated: {current_memory / 1024**2} MB")
-
-        # # 历史最大分配的 CUDA 内存
-        # max_memory = torch.cuda.max_memory_allocated()
-        # print(f"Max CUDA memory allocated: {max_memory / 1024**2} MB")
 
         iamge = model.process(data_dict["audio_tensor_list"],
                               data_dict["uncond_audio_tensor_list"],
