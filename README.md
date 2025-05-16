@@ -43,10 +43,13 @@ pip install -r requirements.txt
 ```
 
 # Example
-* newest 最新
-![](https://github.com/smthemex/ComfyUI_Sonic/blob/main/exampleB.png)
+* new
+![](https://github.com/smthemex/ComfyUI_Sonic/blob/main/example_workflows/example_0516.png)
 
-![](https://github.com/smthemex/ComfyUI_Sonic/blob/main/exampleA.png)
+* old
+![](https://github.com/smthemex/ComfyUI_Sonic/blob/main/example_workflows/exampleB.png)
+* old
+![](https://github.com/smthemex/ComfyUI_Sonic/blob/main/example_workflows/exampleA.png)
 
 # Previous update
 * Replace 'frame number' with 'duration',you can use it to change 'infer audio seconds'. 使用duration替换frame number选项，用于控制输出音频的长度(单位为秒），注意因为实际对比长度是音频振幅数组，不是百分比精准；
