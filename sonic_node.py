@@ -152,8 +152,8 @@ class SONIC_PreData:
         audio2bucket = Audio2bucketModel(seq_len=50, blocks=1, channels=384, clip_channels=1024, intermediate_dim=1024,
                                          output_dim=1, context_tokens=2).to(device)
 
-        audio2token_dict = torch.load(audio2token_ckpt, map_location="cpu")
-        audio2bucket_dict = torch.load(audio2bucket_ckpt, map_location="cpu")
+        audio2token_dict = torch.load(audio2token_ckpt,weights_only=False, map_location="cpu") #>toch2.6 will get error
+        audio2bucket_dict = torch.load(audio2bucket_ckpt,weights_only=False, map_location="cpu") #>toch2.6 will get error
         audio2token.load_state_dict(
             audio2token_dict,
             strict=True,
