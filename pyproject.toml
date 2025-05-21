@@ -3,7 +3,7 @@ name = "comfyui_sonic"
 description = "Sonic is a method about ' Shifting Focus to Global Audio Perception in Portrait Animation',you can use it in comfyUI."
 version = "1.0.0"
 license = {file = "LICENSE"}
-dependencies = ["#diffusers==0.29.0", "#torch==2.2.1", "torchaudio", "#torchvision==0.17.1", "#transformers==4.43.2", "#imageio==2.31.1", "imageio-ffmpeg #==0.5.1", "#gradio==3.50.0", "#omegaconf==2.3.0", "#tqdm==4.65.2", "librosa  #==0.10.2.post1", "#einops==0.7.0"]
+dependencies = ["diffusers>=0.29.0", "torch", "torchaudio", "torchvision", "transformers", "imageio", "imageio-ffmpeg",  "#omegaconf", "tqdm", "libros", "einops","opencv-python"]
 
 [project.urls]
 Repository = "https://github.com/smthemex/ComfyUI_Sonic"
