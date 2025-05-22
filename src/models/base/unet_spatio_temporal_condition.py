@@ -411,13 +411,17 @@ class UNetSpatioTemporalConditionModel(ModelMixin, ConfigMixin, UNet2DConditionL
         # but time_embedding might actually be running in fp16. so we need to cast here.
         # there might be better ways to encapsulate this.
         t_emb = t_emb.to(dtype=sample.dtype)
-        
+        is_mps = sample.device.type == "mps"
         if  isinstance(encoder_hidden_states,tuple): 
             if encoder_hidden_states[0].dtype==torch.bfloat16:
                 t_emb = t_emb.to(dtype=torch.bfloat16)
+            elif encoder_hidden_states[0].dtype==torch.float16 and is_mps: 
+                t_emb = t_emb.to(dtype=torch.float16)
         elif isinstance(encoder_hidden_states,torch.Tensor): 
             if encoder_hidden_states.dtype==torch.bfloat16:
                 t_emb = t_emb.to(dtype=torch.bfloat16)
+            elif encoder_hidden_states.dtype==torch.float16 and is_mps:
+                t_emb = t_emb.to(dtype=torch.float16)
         else:
             pass
             
@@ -455,8 +459,12 @@ class UNetSpatioTemporalConditionModel(ModelMixin, ConfigMixin, UNet2DConditionL
         if  isinstance(encoder_hidden_states,tuple):
             if encoder_hidden_states[0].dtype==torch.bfloat16:
                 sample = sample.to(emb.dtype) #to bf
+            elif encoder_hidden_states[0].dtype==torch.float16 and is_mps: 
+                sample = sample.to(emb.dtype) #to fp16
         elif isinstance(encoder_hidden_states,torch.Tensor): 
             if encoder_hidden_states.dtype==torch.bfloat16:
+                sample = sample.to(emb.dtype)
+            elif encoder_hidden_states.dtype==torch.float16 and is_mps:
                 sample = sample.to(emb.dtype)
         sample = self.conv_in(sample)
         
