@@ -5,13 +5,13 @@ import torch
 import gc
 import numpy as np
 from omegaconf import OmegaConf
-from diffusers import AutoencoderKLTemporalDecoder
+#from diffusers import AutoencoderKLTemporalDecoder
 from diffusers.schedulers import EulerDiscreteScheduler
 from transformers import WhisperModel, AutoFeatureExtractor
 import random
 import io
 import torchaudio
-from .src.models.base.unet_spatio_temporal_condition import UNetSpatioTemporalConditionModel
+#from .src.models.base.unet_spatio_temporal_condition import UNetSpatioTemporalConditionModel
 from .sonic import Sonic, sonic_predata, preprocess_face, crop_face_image
 from .src.dataset.test_preprocess import image_audio_to_tensor
 from .src.models.audio_adapter.audio_proj import AudioProjModel
