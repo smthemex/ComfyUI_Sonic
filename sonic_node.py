@@ -173,12 +173,13 @@ class SONIC_PreData:
 
         infer_duration = min(duration,duration_input)
         print(f"Input audio duration is {duration_input} seconds, infer audio duration is: {duration} seconds.")
-        # 减少音频数据传递导致的不必要文件存储
-        buff = io.BytesIO()
-        torchaudio.save(buff, audio["waveform"].squeeze(0), audio["sample_rate"], format="FLAC")
-
-        with open(audio_path, 'wb') as f:
-            f.write(buff.getbuffer())
+        # 修改为直接保存到临时文件，这是稳定可靠的必需步骤
+        torchaudio.save(
+            audio_path,
+            audio["waveform"].squeeze(0),
+            audio["sample_rate"],
+            format="FLAC"
+        )
         gc.collect()
         torch.cuda.empty_cache()
 
@@ -284,3 +285,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "SONIC_PreData": "SONIC_PreData",
     "SONICSampler": "SONICSampler",
 }
+
+
