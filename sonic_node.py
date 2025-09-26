@@ -178,7 +178,7 @@ class SONIC_PreData:
             audio_path,
             audio["waveform"].squeeze(0),
             audio["sample_rate"],
-            format="WAV"
+            format="FLAC"
         )
         gc.collect()
         torch.cuda.empty_cache()
@@ -285,4 +285,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "SONIC_PreData": "SONIC_PreData",
     "SONICSampler": "SONICSampler",
 }
+
 
