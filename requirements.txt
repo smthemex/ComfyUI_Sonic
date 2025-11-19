@@ -1,7 +1,7 @@
 diffusers >=0.29.0
 opencv-python
 torch
-torchaudio
+scipy
 torchvision
 transformers
 imageio
