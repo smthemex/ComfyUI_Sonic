@@ -10,7 +10,7 @@ from diffusers.schedulers import EulerDiscreteScheduler
 from transformers import WhisperModel, AutoFeatureExtractor
 import random
 import io
-import torchaudio
+from scipy.io import wavfile
 #from .src.models.base.unet_spatio_temporal_condition import UNetSpatioTemporalConditionModel
 from .sonic import Sonic, sonic_predata, preprocess_face, crop_face_image
 from .src.dataset.test_preprocess import image_audio_to_tensor
@@ -174,12 +174,18 @@ class SONIC_PreData:
         infer_duration = min(duration,duration_input)
         print(f"Input audio duration is {duration_input} seconds, infer audio duration is: {duration} seconds.")
         # 修改为直接保存到临时文件，这是稳定可靠的必需步骤
-        torchaudio.save(
-            audio_path,
-            audio["waveform"].squeeze(0),
-            audio["sample_rate"],
-            format="WAV"
-        )
+        # Convert waveform (torch.Tensor or numpy) to shape (samples, channels) for scipy
+        waveform = audio["waveform"].squeeze(0)
+        if hasattr(waveform, "cpu"):
+            waveform = waveform.cpu().numpy()
+        # torchaudio uses (channels, samples); scipy expects (samples, channels)
+        if waveform.ndim == 2:
+            waveform = waveform.T
+        # Ensure sample rate is int and dtype is supported (float32 or int16)
+        sample_rate = int(audio["sample_rate"])
+        if waveform.dtype.kind == "f":
+            waveform = waveform.astype(np.float32)
+        wavfile.write(audio_path, sample_rate, waveform)
         gc.collect()
         torch.cuda.empty_cache()
 
