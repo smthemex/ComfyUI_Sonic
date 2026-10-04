@@ -210,11 +210,8 @@ class SONIC_PreData:
 
         height, width = ref_img.shape[-2:]
 
-        #print(vae.device,device)
-        if vae.device!=device:
-            vae.device=device
+        # Let ComfyUI manage the VAE's configured device and model loading.
         img_latent=vae.encode(tensor_upscale(image,width,height)).to(device, dtype=weight_dtype) 
-        vae.device=torch.device("cpu")
        
         from comfy.model_management import unload_all_models
         print(unload_all_models())
