@@ -87,26 +87,66 @@ def crop_face_image(face_image,crop_bbox):
     return crop_image
 
 
-def decode_latents_(latents,vae,device, decode_chunk_size=14):
+def decode_latents_(latents, vae, device, decode_chunk_size=14):
+        if (
+            isinstance(decode_chunk_size, bool)
+            or not isinstance(decode_chunk_size, int)
+            or decode_chunk_size <= 0
+        ):
+            raise ValueError("decode_chunk_size must be a positive integer")
+
+        execution_device = getattr(getattr(vae, "patcher", None), "load_device", None)
+        if execution_device is None:
+            execution_device = getattr(vae, "device", None)
+        if execution_device is None:
+            execution_device = device
+        is_mps = torch.device(execution_device).type == "mps"
+        chunk_size = 1 if is_mps else decode_chunk_size
+
         # [batch, frames, channels, height, width] -> [batch*frames, channels, height, width]
         latents = latents.flatten(0, 1)
 
         latents = 1 / 0.18215 * latents
-        vae.device = device
-        
-        # forward_vae_fn = self.vae._orig_mod.forward if is_compiled_module(self.vae) else self.vae.forward
-        # accepts_num_frames = "num_frames" in set(inspect.signature(forward_vae_fn).parameters.keys())
 
-        # decode decode_chunk_size frames at a time to avoid OOM
+        # Limit MPS batches to avoid oversized group_norm intermediates.
+        decode_vae = vae
         frames = []
-        for i in range(0, latents.shape[0], decode_chunk_size):
-            #num_frames_in = latents[i : i + decode_chunk_size].shape[0]
-            #decode_kwargs = {}
-            # if accepts_num_frames:
-            #     # we only pass num_frames_in if it's expected
-            #     decode_kwargs["num_frames"] = num_frames_in
+        for i in range(0, latents.shape[0], chunk_size):
+            chunk = latents[i : i + chunk_size]
+            if decode_vae is not vae:
+                chunk = chunk.to(device="cpu", dtype=torch.float32)
 
-            frame = vae.decode(latents[i : i + decode_chunk_size])
+            retry_on_cpu = False
+            try:
+                frame = decode_vae.decode(chunk)
+            except RuntimeError as error:
+                if (
+                    decode_vae is not vae
+                    or not is_mps
+                    or "Can't be indexed using 32-bit iterator" not in str(error)
+                ):
+                    raise
+                retry_on_cpu = True
+
+            # Retry outside the except block so the failed decode's traceback is released.
+            if retry_on_cpu:
+                from comfy.sd import VAE
+
+                print("MPS VAE decode hit the 32-bit iterator limitation; continuing on CPU/fp32.")
+                cpu_device = torch.device("cpu")
+                # A new managed VAE keeps model placement and dtype in sync.
+                cpu_sd = {
+                    name: value.detach().to(
+                        device=cpu_device,
+                        dtype=torch.float32 if value.is_floating_point() else value.dtype,
+                        copy=True,
+                    ) if torch.is_tensor(value) else value
+                    for name, value in vae.get_sd().items()
+                }
+                decode_vae = VAE(sd=cpu_sd, device=cpu_device, dtype=torch.float32)
+                decode_vae.output_device = cpu_device
+                del cpu_sd
+                frame = decode_vae.decode(chunk.to(device=cpu_device, dtype=torch.float32))
             frames.append(frame.cpu())
         frames = torch.cat(frames, dim=0) # [50, 512, 512, 3]
 
@@ -167,7 +207,7 @@ def test(
 
     pipe.to(device=torch.device("cpu"))
 
-    video=decode_latents_(video, vae,device, decode_chunk_size=14) # torch.Size([1, 3, 250, 512, 512])
+    video = decode_latents_(video, vae, device, decode_chunk_size=config.decode_chunk_size)
 
     # Concat it with pose tensor
     # pose_tensor = torch.stack(pose_tensor_list,1).unsqueeze(0)
