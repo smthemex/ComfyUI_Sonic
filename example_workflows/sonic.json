@@ -1,0 +1,628 @@
+{
+  "id": "3468a90d-96bb-4dbf-a5d4-bfed254ca91d",
+  "revision": 0,
+  "last_node_id": 15,
+  "last_link_id": 27,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "SONICNativeLoader",
+      "pos": [
+        5.396283179925263,
+        -1073.0673184922707
+      ],
+      "size": [
+        316.74483990073884,
+        210.90934371286485
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "links": [
+            4
+          ]
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "links": [
+            2,
+            6
+          ]
+        },
+        {
+          "name": "clip_vision",
+          "type": "CLIP_VISION",
+          "links": [
+            1
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SONICNativeLoader"
+      },
+      "widgets_values": [
+        "svd_xt_1_1.safetensors",
+        "unet.pth",
+        1,
+        "fp16"
+      ],
+      "widgets_values_named": {
+        "svd_checkpoint": "svd_xt_1_1.safetensors",
+        "sonic_unet": "unet.pth",
+        "ip_audio_scale": 1,
+        "dtype": "fp16"
+      }
+    },
+    {
+      "id": 2,
+      "type": "SONICNativePreData",
+      "pos": [
+        414.7545038018742,
+        -916.4236767645793
+      ],
+      "size": [
+        463.67462733335304,
+        185.35419931370237
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip_vision",
+          "type": "CLIP_VISION",
+          "link": 1
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 2
+        },
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "link": 9
+        },
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 10
+        }
+      ],
+      "outputs": [
+        {
+          "name": "SONIC_NATIVE_DATA",
+          "type": "SONIC_NATIVE_DATA",
+          "links": [
+            3
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SONICNativePreData"
+      },
+      "widgets_values": [
+        512,
+        0
+      ],
+      "widgets_values_named": {
+        "min_resolution": 512,
+        "duration": 0
+      }
+    },
+    {
+      "id": 3,
+      "type": "SONICNativeSampler",
+      "pos": [
+        954.5113282869672,
+        -983.3215779216798
+      ],
+      "size": [
+        289.34375,
+        270
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 4
+        },
+        {
+          "name": "sonic_data",
+          "type": "SONIC_NATIVE_DATA",
+          "link": 3
+        }
+      ],
+      "outputs": [
+        {
+          "name": "latent",
+          "type": "LATENT",
+          "links": [
+            5
+          ]
+        },
+        {
+          "name": "fps",
+          "type": "FLOAT",
+          "links": [
+            27
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SONICNativeSampler"
+      },
+      "widgets_values": [
+        140338611,
+        "fixed",
+        25,
+        1,
+        12.5,
+        2,
+        7.5,
+        1,
+        14
+      ],
+      "widgets_values_named": {
+        "seed": 140338611,
+        "control_after_generate": "fixed",
+        "steps": 25,
+        "dynamic_scale": 1,
+        "fps": 12.5,
+        "appearance_guidance": 2,
+        "audio_guidance": 7.5,
+        "strength": 1,
+        "frames_per_batch": 14
+      }
+    },
+    {
+      "id": 4,
+      "type": "VAEDecode",
+      "pos": [
+        991.7211967239159,
+        -1108.4329966994974
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 5
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 6
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            19
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      }
+    },
+    {
+      "id": 5,
+      "type": "CreateVideo",
+      "pos": [
+        1402.0132278616393,
+        -823.1175396506488
+      ],
+      "size": [
+        270,
+        150
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 20
+        },
+        {
+          "name": "audio",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": 11
+        },
+        {
+          "name": "fps",
+          "type": "FLOAT",
+          "widget": {
+            "name": "fps"
+          },
+          "link": 21
+        }
+      ],
+      "outputs": [
+        {
+          "name": "VIDEO",
+          "type": "VIDEO",
+          "links": [
+            12
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CreateVideo"
+      },
+      "widgets_values": [
+        30,
+        "auto",
+        "sRGB",
+        "none"
+      ],
+      "widgets_values_named": {
+        "fps": 30,
+        "bit_depth": "auto",
+        "color_space": "sRGB",
+        "codec": "none"
+      }
+    },
+    {
+      "id": 6,
+      "type": "LoadAudio",
+      "pos": [
+        2.912429630825244,
+        -787.9049492261935
+      ],
+      "size": [
+        299.50518220099093,
+        155.5187195444046
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "AUDIO",
+          "type": "AUDIO",
+          "links": [
+            9,
+            11
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadAudio"
+      },
+      "widgets_values": [
+        "chunwang.wav",
+        ""
+      ],
+      "widgets_values_named": {
+        "audio": "chunwang.wav",
+        "upload": ""
+      }
+    },
+    {
+      "id": 7,
+      "type": "LoadImage",
+      "pos": [
+        6.831120114686783,
+        -590.3582124888662
+      ],
+      "size": [
+        355.90063759518443,
+        358.8169674739888
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            10
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "anime1.png",
+        "image"
+      ],
+      "widgets_values_named": {
+        "image": "anime1.png",
+        "upload": "image"
+      }
+    },
+    {
+      "id": 8,
+      "type": "SaveVideo",
+      "pos": [
+        938.0616936405455,
+        -619.0706185005827
+      ],
+      "size": [
+        446.77371234860743,
+        413.76268549448554
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "link": 12
+        }
+      ],
+      "outputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "links": null
+        }
+      ],
+      "properties": {},
+      "widgets_values": [
+        "video/ComfyUI",
+        "auto",
+        "auto",
+        "auto"
+      ],
+      "widgets_values_named": {
+        "filename_prefix": "video/ComfyUI",
+        "format": "auto",
+        "format.codec": "auto",
+        "codec": "auto"
+      }
+    },
+    {
+      "id": 9,
+      "type": "MarkdownNote",
+      "pos": [
+        473.64351239825237,
+        -574.6913143429524
+      ],
+      "size": [
+        404.89989828724595,
+        133.7208980580609
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "# If OOM 'frame_per_batch' number to 14 \n# 如果OOM 时间滑动窗口帧数改成14\n# duration == 0  ，use origin audio length\n# duration为0时，推理音频时长为总长"
+      ],
+      "widgets_values_named": {
+        "text": "# If OOM 'frame_per_batch' number to 14 \n# 如果OOM 时间滑动窗口帧数改成14\n# duration == 0  ，use origin audio length\n# duration为0时，推理音频时长为总长"
+      },
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 11,
+      "type": "SONICNativeRife",
+      "pos": [
+        1364.582970269693,
+        -993.4766037178367
+      ],
+      "size": [
+        328.4322265625,
+        78
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 19
+        },
+        {
+          "name": "fps",
+          "type": "FLOAT",
+          "widget": {
+            "name": "fps"
+          },
+          "link": 27
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            20
+          ]
+        },
+        {
+          "name": "fps",
+          "type": "FLOAT",
+          "links": [
+            21
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SONICNativeRife"
+      },
+      "widgets_values": [
+        12.5
+      ],
+      "widgets_values_named": {
+        "fps": 12.5
+      }
+    }
+  ],
+  "links": [
+    [
+      3,
+      2,
+      0,
+      3,
+      1,
+      "SONIC_NATIVE_DATA"
+    ],
+    [
+      4,
+      1,
+      0,
+      3,
+      0,
+      "MODEL"
+    ],
+    [
+      5,
+      3,
+      0,
+      4,
+      0,
+      "LATENT"
+    ],
+    [
+      6,
+      1,
+      1,
+      4,
+      1,
+      "VAE"
+    ],
+    [
+      11,
+      6,
+      0,
+      5,
+      1,
+      "AUDIO"
+    ],
+    [
+      19,
+      4,
+      0,
+      11,
+      0,
+      "IMAGE"
+    ],
+    [
+      20,
+      11,
+      0,
+      5,
+      0,
+      "IMAGE"
+    ],
+    [
+      21,
+      11,
+      1,
+      5,
+      2,
+      "FLOAT"
+    ],
+    [
+      12,
+      5,
+      0,
+      8,
+      0,
+      "VIDEO"
+    ],
+    [
+      1,
+      1,
+      2,
+      2,
+      0,
+      "CLIP_VISION"
+    ],
+    [
+      2,
+      1,
+      1,
+      2,
+      1,
+      "VAE"
+    ],
+    [
+      9,
+      6,
+      0,
+      2,
+      2,
+      "AUDIO"
+    ],
+    [
+      10,
+      7,
+      0,
+      2,
+      3,
+      "IMAGE"
+    ],
+    [
+      27,
+      3,
+      1,
+      11,
+      1,
+      "FLOAT"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "Group",
+      "bounding": [
+        -7.087570369174756,
+        -1178.4329966994974,
+        1710.1027672013677,
+        983.1250636934003
+      ],
+      "color": "#3f789e",
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.7887664452380968,
+      "offset": [
+        390.99625944563485,
+        1319.5751322794554
+      ]
+    },
+    "frontendVersion": "1.57.1"
+  },
+  "version": 0.4
+}
