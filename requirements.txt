@@ -1,22 +1,2 @@
-diffusers >=0.29.0
-opencv-python
 torch
-torchaudio
 torchvision
-transformers
-imageio
-imageio-ffmpeg
-omegaconf
-tqdm
-librosa
-einops
-#tqdm ==4.65.2
-#librosa  ==0.10.2.post1
-#einops ==0.7.0
-#imageio-ffmpeg ==0.5.1
-#gradio==3.50.0
-#transformers ==4.43.2
-#imageio ==2.31.1
-#torchvision ==0.17.1
-#torch ==2.2.1
-#diffusers >=0.29.0
